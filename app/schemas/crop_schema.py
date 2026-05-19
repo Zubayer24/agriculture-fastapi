@@ -2,19 +2,27 @@ from pydantic import BaseModel
 from typing import List, Dict
 
 
+from pydantic import BaseModel
+from typing import List, Dict
+
+
 class YieldEfficiencyItem(BaseModel):
 
     crop_name: str
     crop_category: str
 
-    avg_yield_per_hectare: float
-    total_area_ha: float
+    avg_yield_benchmark_ton_per_ha: float
+    actual_avg_yield_ton_per_ha: float
+
+    efficiency_pct: float
+    total_area_planted_ha: float
+
+    season: str
 
 
 class YieldEfficiencyResponse(BaseModel):
 
     filters_applied: Dict
-
     data: List[YieldEfficiencyItem]
 
 

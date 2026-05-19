@@ -22,63 +22,64 @@ from app.utils.validators import (
     VALID_REGIONS
 )
 
+
+from app.database import engine
+import pandas as pd
+
 router = APIRouter()
 
 @router.get(
     "/crops/yield-efficiency",
     response_model=YieldEfficiencyResponse
 ) 
+
+
+
 def yield_efficiency(
+    crop_category: str = Query(None),
+    season: str = Query(None),
+    year: int = Query(None),
+    region: str = Query(None),
+    water_requirement: str = Query(None)):
 
-    crop_category: str = Query(
-        None,
-        description="Filter by crop category"
-    ),
+    df = pd.read_sql("SELECT * FROM vw_harvest_full", engine)
 
-    region: str = Query(
-        None,
-        description="Filter by region"
-    )
-):
-
-    try:
-
-        crop_category = validate_filter(
-            crop_category,
-            VALID_CROP_CATEGORIES,
-            "crop_category"
-        )
-
-        region = validate_filter(
-            region,
-            VALID_REGIONS,
-            "region"
-        )
-
-    except ValueError as e:
-
-        raise HTTPException(
-            status_code=422,
-            detail=str(e)
-        )
-
-    df = get_yield_efficiency(
+    result_df = get_yield_efficiency(
+        df,
         crop_category,
-        region
+        season,
+        year,
+        region,
+        water_requirement
     )
+
+
+    filters_applied = {}
+
+    if crop_category:
+        filters_applied["crop_category"] = crop_category
+    if season:
+        filters_applied["season"] = season
+    if year:
+        filters_applied["year"] = year
+    if region:
+        filters_applied["region"] = region
+    if water_requirement:
+        filters_applied["water_requirement"] = water_requirement
+
 
     return {
-
-        "filters_applied": {
-            "crop_category": crop_category,
-            "region": region
-        },
-
-        "data": df.to_dict(
-            orient="records"
-        )
-    }
-
+        "filters_applied": filters_applied,
+        "data": result_df[[
+            "crop_name",
+            "crop_category",
+            "avg_yield_benchmark_ton_per_ha",
+            "actual_avg_yield_ton_per_ha",
+            "efficiency_pct",
+            "total_area_planted_ha",
+            "season"
+        ]].to_dict(orient="records")
+    } 
 
 @router.get(
     "/crops/seasonal-trend",

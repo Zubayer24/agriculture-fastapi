@@ -8,6 +8,14 @@ def apply_filters(df, filters):
         if column not in df.columns:
             continue
 
-        df = df[df[column] == value]
+        col_series = df[column]
 
-    return df 
+        # STRING FILTERS
+        if col_series.dtype == "object":
+            df = df[col_series.str.lower() == str(value).strip().lower()]
+
+        # NUMERIC FILTERS (year etc.)
+        else:
+            df = df[col_series == value]
+
+    return df

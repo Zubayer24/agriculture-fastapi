@@ -4,41 +4,59 @@ from app.utils.data_loaders import (
 ) 
 
 from app.utils.filters import apply_filters
+from app.utils.constants import water_requirement_map, benchmark_yield
 
+import pandas as pd
 
 def get_yield_efficiency(
+    df: pd.DataFrame,
     crop_category=None,
-    region=None
+    season=None,
+    year=None,
+    region=None,
+    water_requirement=None
 ):
 
-    df = load_harvest_data()
 
     filters = {
         "crop_category": crop_category,
+        "season": season,
+        "year": year,
         "region": region
     }
 
-    df = apply_filters(df, filters)
+    for col, val in filters.items():
+        if val is not None and col in df.columns:
+            df = df[df[col] == val]
 
-    grouped_df = (
-        df.groupby(
-            ["crop_name", "crop_category"],
-            as_index=False
-        )
-        .agg(
-            avg_yield_per_hectare=(
-                "yield_per_hectare",
-                "mean"
-            ),
 
-            total_area_ha=(
-                "area_planted_ha",
-                "sum"
-            )
-        )
+    grouped = df.groupby(
+        ["crop_name", "crop_category", "season"],
+        as_index=False
+    ).agg(
+        total_area_planted_ha=("area_planted_ha", "sum"),
+        total_yield=("quantity_harvested_ton", "sum")
     )
 
-    return grouped_df
+
+    grouped["actual_avg_yield_ton_per_ha"] = (
+        grouped["total_yield"] / grouped["total_area_planted_ha"]
+    )
+
+    grouped["avg_yield_benchmark_ton_per_ha"] = grouped["crop_name"].map(benchmark_yield)
+
+    grouped["efficiency_pct"] = (
+        grouped["actual_avg_yield_ton_per_ha"] /
+        grouped["avg_yield_benchmark_ton_per_ha"]
+    ) * 100
+
+
+    grouped["water_requirement"] = grouped["crop_name"].map(water_requirement_map)
+
+    if water_requirement is not None:
+        grouped = grouped[grouped["water_requirement"] == water_requirement]
+
+    return grouped
 
 
 def get_crop_trend(
