@@ -14,10 +14,3 @@ app.include_router(crops_router)
 
 app.include_router(markets_router)
 
-
-@app.get("/")
-def home():
-
-    return {
-        "message": "API Running Successfully"
-    }

@@ -6,16 +6,18 @@ class MarketComparisonItem(BaseModel):
 
     market_name: str
     market_type: str
+    price_tier: str
+    district: str
+
     crop_name: str
 
     avg_price_per_ton_bdt: float
+    total_quantity_sold_ton: float
     total_revenue_bdt: float
 
 
-class MarketComparisonResponse(BaseModel):
+class MarketPriceComparisonResponse(BaseModel):
 
     filters_applied: Dict
 
-    comparison: List[
-        MarketComparisonItem
-    ]
+    comparison: List[MarketComparisonItem]

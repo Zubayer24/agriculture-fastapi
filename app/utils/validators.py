@@ -63,6 +63,45 @@ VALID_QUALITY_GRADES = {
 
 VALID_QUARTERS = [1, 2, 3, 4] 
 
+
+VALID_PRICE_TIERS = {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "premium": "Premium"
+}
+
+
+VALID_DISTRICTS = {
+    "gazipur": "Gazipur",
+    "comilla": "Comilla",
+    "narsingdi": "Narsingdi",
+    "mymensingh": "Mymensingh",
+    "tangail": "Tangail",
+    "sylhet": "Sylhet",
+    "rangamati": "Rangamati",
+    "chapainawabganj": "Chapainawabganj",
+    "rangpur": "Rangpur",
+    "manikganj": "Manikganj",
+    "sirajganj": "Sirajganj",
+    "jamalpur": "Jamalpur",
+    "noakhali": "Noakhali",
+    "feni": "Feni",
+    "kurigram": "Kurigram",
+    "kishoreganj": "Kishoreganj",
+    "gopalganj": "Gopalganj",
+    "jashore": "Jashore",
+    "rajshahi": "Rajshahi",
+    "sunamganj": "Sunamganj",
+    "moulvibazar": "Moulvibazar",
+    "lalmonirhat": "Lalmonirhat",
+    "satkhira": "Satkhira",
+    "bhola": "Bhola",
+    "patuakhali": "Patuakhali",
+    "barisal": "Barisal"
+} 
+
+
 def validate_filter(
     value,
     valid_values,
