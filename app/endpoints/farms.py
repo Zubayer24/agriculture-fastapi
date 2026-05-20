@@ -26,6 +26,7 @@ from app.utils.validators import (
     VALID_FARM_TYPES,
     VALID_CROP_CATEGORIES,
     VALID_MARKET_TYPES,
+    VALID_GROWING_SEASONS,
     VALID_SEASONS,
     VALID_YEARS,
     VALID_QUALITY_GRADES 
@@ -334,13 +335,17 @@ def loss_analysis(
 
     year: int = Query(
         None,
-        description="Filter by year" 
+        description="Filter by year"  
     ), 
 
     season: str = Query(
         None,
         description="Filter by season"
     ),
+
+    growing_season: str = Query(
+    None,
+    description="Filter by growing season"),  
 
     quality_grade: str = Query(
         None,
@@ -373,6 +378,11 @@ def loss_analysis(
             "season"
         ) 
 
+        growing_season = validate_filter(
+        growing_season,
+        VALID_GROWING_SEASONS,
+        "growing_season") 
+
         quality_grade = validate_filter(
             quality_grade,
             VALID_QUALITY_GRADES,
@@ -395,6 +405,7 @@ def loss_analysis(
         region,
         year,
         season,
+        growing_season,
         quality_grade,
         crop_category
     ) 
@@ -409,6 +420,9 @@ def loss_analysis(
 
     if season is not None:
         filters_applied["season"] = season
+
+    if growing_season is not None:
+        filters_applied["growing_season"] = growing_season 
 
     if quality_grade is not None:
         filters_applied["quality_grade"] = quality_grade

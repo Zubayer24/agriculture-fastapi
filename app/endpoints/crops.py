@@ -19,7 +19,10 @@ from app.schemas.crop_schema import (
 from app.utils.validators import (
     validate_filter,
     VALID_CROP_CATEGORIES,
-    VALID_REGIONS
+    VALID_REGIONS,
+    VALID_YEARS,
+    VALID_QUARTERS,
+    VALID_MARKET_TYPES
 )
 
 
@@ -36,11 +39,11 @@ router = APIRouter()
 
 
 def yield_efficiency(
-    crop_category: str = Query(None),
-    season: str = Query(None),
-    year: int = Query(None),
-    region: str = Query(None),
-    water_requirement: str = Query(None)):
+    crop_category: str = Query(None, description="filter by crop category"),
+    season: str = Query(None, description="filter by season"),
+    year: int = Query(None, description="filter by year"),
+    region: str = Query(None, description="filter by region"),
+    water_requirement: str = Query(None, description="filter by water requirement (low, medium, high)")):
 
     df = pd.read_sql("SELECT * FROM vw_harvest_full", engine)
 
@@ -84,8 +87,13 @@ def yield_efficiency(
 @router.get(
     "/crops/seasonal-trend",
     response_model=SeasonalTrendResponse
-) 
+)
 def seasonal_trend(
+
+    crop_name: str = Query(
+        None,
+        description="Filter by crop name"
+    ),
 
     crop_category: str = Query(
         None,
@@ -95,6 +103,16 @@ def seasonal_trend(
     year: int = Query(
         None,
         description="Filter by year"
+    ),
+
+    quarter: int = Query(
+        None,
+        description="Filter by quarter"
+    ),
+
+    market_type: str = Query(
+        None,
+        description="Filter by market type"
     )
 ):
 
@@ -106,6 +124,24 @@ def seasonal_trend(
             "crop_category"
         )
 
+        year = validate_filter(
+            year,
+            VALID_YEARS,
+            "year"
+        )
+
+        quarter = validate_filter(
+            quarter,
+            VALID_QUARTERS,
+            "quarter"
+        )
+
+        market_type = validate_filter(
+            market_type,
+            VALID_MARKET_TYPES,
+            "market_type"
+        )
+
     except ValueError as e:
 
         raise HTTPException(
@@ -113,22 +149,54 @@ def seasonal_trend(
             detail=str(e)
         )
 
-    df = get_crop_trend(
-        crop_category,
-        year
+    df = pd.read_sql(
+        "SELECT * FROM vw_harvest_full",
+        engine
     )
+
+    result_df = get_crop_trend(
+        df,
+        crop_name,
+        crop_category,
+        year,
+        quarter,
+        market_type
+    )
+
+    filters_applied = {}
+
+    if crop_name is not None:
+        filters_applied["crop_name"] = crop_name
+
+    if crop_category is not None:
+        filters_applied["crop_category"] = crop_category
+
+    if year is not None:
+        filters_applied["year"] = year
+
+    if quarter is not None:
+        filters_applied["quarter"] = quarter
+
+    if market_type is not None:
+        filters_applied["market_type"] = market_type
 
     return {
 
-        "filters_applied": {
-            "crop_category": crop_category,
-            "year": year
-        },
+        "filters_applied": filters_applied,
 
-        "trend": df.to_dict(
-            orient="records"
-        )
-    }
+        "trend": result_df[
+            [
+                "crop_name",
+                "year",
+                "quarter",
+                "season",
+                "total_quantity_sold_ton",
+                "total_revenue_bdt",
+                "avg_price_per_ton_bdt",
+                "num_harvests"
+            ]
+        ].to_dict(orient="records")
+    } 
 
 
 @router.get(

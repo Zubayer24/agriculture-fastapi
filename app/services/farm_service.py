@@ -120,10 +120,13 @@ def get_top_farms(
     df["rank"] = df.index + 1
     return df 
 
+
+
 def get_loss_analysis(
     region=None,
     year=None,
     season=None,
+    growing_season=None,
     quality_grade=None,
     crop_category=None
 ): 
@@ -134,6 +137,7 @@ def get_loss_analysis(
         "region": region,
         "year": year,
         "season": season,
+        "growing_season": growing_season,
         "quality_grade": quality_grade,
         "crop_category": crop_category
     }

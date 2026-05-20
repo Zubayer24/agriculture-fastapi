@@ -12,9 +12,14 @@ def apply_filters(df, filters):
 
         # STRING FILTERS
         if col_series.dtype == "object":
-            df = df[col_series.str.lower() == str(value).strip().lower()]
 
-        # NUMERIC FILTERS (year etc.)
+            df = df[
+                col_series.astype(str)
+                .str.strip()
+                .str.lower() == str(value).strip().lower()
+            ]
+
+        # NUMERIC FILTERS
         else:
             df = df[col_series == value]
 

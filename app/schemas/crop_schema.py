@@ -32,17 +32,22 @@ class YieldEfficiencyResponse(BaseModel):
 class SeasonalTrendItem(BaseModel):
 
     crop_name: str
-    crop_category: str
     year: int
+    quarter: int
+    season: str
 
+    total_quantity_sold_ton: float
     total_revenue_bdt: float
+    avg_price_per_ton_bdt: float
+
+    num_harvests: int
 
 
 class SeasonalTrendResponse(BaseModel):
 
     filters_applied: Dict
 
-    trend: List[Dict]
+    trend: List[SeasonalTrendItem] 
 
 
 # ------------------------------------

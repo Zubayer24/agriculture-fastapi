@@ -81,4 +81,4 @@ def market_comparison(
         "comparison": df.to_dict(
             orient="records"
         )
-    }
+    } 

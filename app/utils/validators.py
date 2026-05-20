@@ -40,10 +40,17 @@ VALID_CROP_CATEGORIES = {
 VALID_SEASONS = {
     "summer": "Summer",
     "winter": "Winter",
-    "monsoon": "Monsoon",
     "autumn": "Autumn",
     "spring": "Spring"
 } 
+
+VALID_GROWING_SEASONS = {
+    "rabi": "Rabi",
+    "kharif": "Kharif",
+    "zaid": "Zaid",
+    "year-round": "Year-Round"
+}
+
 
 VALID_YEARS = [2022, 2023, 2024]
 
@@ -53,6 +60,8 @@ VALID_QUALITY_GRADES = {
     "c": "C",
     "d": "D"
 } 
+
+VALID_QUARTERS = [1, 2, 3, 4] 
 
 def validate_filter(
     value,
