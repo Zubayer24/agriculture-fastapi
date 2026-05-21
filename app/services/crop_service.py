@@ -1,6 +1,7 @@
 from app.utils.data_loaders import (
     load_harvest_data,
-    load_crop_revenue
+    load_crop_revenue,
+    load_crop_dimension
 ) 
 
 from app.utils.filters import apply_filters
@@ -130,26 +131,121 @@ def get_crop_trend(
     return grouped
 
 
+
 def get_quality_breakdown(
-    crop_category=None
+    crop_id=None,
+    crop_category=None,
+    year=None,
+    region=None,
+    market_type=None,
+    pesticide_residue=None
 ):
 
     df = load_harvest_data()
 
+    # -----------------------------
+    # crop_id -> crop_name mapping
+    # -----------------------------
+    if crop_id is not None:
+
+        crop_df = load_crop_dimension()
+
+        crop_match = crop_df[
+            crop_df["crop_id"] == crop_id
+        ]
+
+        if crop_match.empty:
+
+            df = df.iloc[0:0]
+
+        else:
+
+            crop_name = (
+                crop_match.iloc[0]["crop_name"]
+            )
+
+            df = df[
+                df["crop_name"] == crop_name
+            ]
+
+    # -----------------------------
+    # remaining filters
+    # -----------------------------
     filters = {
-        "crop_category": crop_category
+        "crop_category": crop_category,
+        "year": year,
+        "region": region,
+        "market_type": market_type,
+        "pesticide_residue": pesticide_residue
     }
 
     df = apply_filters(df, filters)
 
-    grouped_df = (
-        df.groupby(
-            ["crop_name", "quality_grade"],
-            as_index=False
-        )
-        .agg(
-            total_quantity=("quantity_harvested_ton", "sum")
-        )
-    )
+    total_records = len(df)
 
-    return grouped_df
+    # -----------------------------
+    # Grade Distribution
+    # -----------------------------
+    grade_distribution = {}
+
+    grades = ["A", "B", "C", "D"]
+
+    for grade in grades:
+
+        grade_df = df[
+            df["quality_grade"] == grade
+        ]
+
+        count = len(grade_df)
+
+        pct = (
+            (count / total_records) * 100
+            if total_records > 0 else 0
+        )
+
+        avg_revenue = (
+            grade_df["revenue_bdt"].mean()
+            if count > 0 else 0
+        )
+
+        grade_distribution[grade] = {
+            "count": count,
+            "pct": round(pct, 1),
+            "avg_revenue_bdt": round(avg_revenue, 1)
+        }
+
+    # -----------------------------
+    # Pesticide Breakdown
+    # -----------------------------
+    pesticide_breakdown = {}
+
+    residue_levels = [
+        "None",
+        "Trace",
+        "Low",
+        "High"
+    ]
+
+    for residue in residue_levels:
+
+        residue_df = df[
+            df["pesticide_residue"] == residue
+        ]
+
+        count = len(residue_df)
+
+        pct = (
+            (count / total_records) * 100
+            if total_records > 0 else 0
+        )
+
+        pesticide_breakdown[residue] = {
+            "count": count,
+            "pct": round(pct, 1)
+        }
+
+    return {
+        "total_records": total_records,
+        "grade_distribution": grade_distribution,
+        "pesticide_residue_breakdown": pesticide_breakdown
+    } 

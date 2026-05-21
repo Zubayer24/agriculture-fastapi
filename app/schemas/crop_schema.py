@@ -53,16 +53,29 @@ class SeasonalTrendResponse(BaseModel):
 # ------------------------------------
 
 
-class QualityBreakdownItem(BaseModel):
+from typing import Dict
+from pydantic import BaseModel
 
-    crop_name: str
-    quality_grade: str
 
-    total_quantity: float
+class GradeItem(BaseModel):
+
+    count: int
+    pct: float
+    avg_revenue_bdt: float
+
+
+class PesticideItem(BaseModel):
+
+    count: int
+    pct: float
 
 
 class QualityBreakdownResponse(BaseModel):
 
-    quality_breakdown: List[
-        QualityBreakdownItem
-    ]
+    filters_applied: Dict
+
+    total_records: int
+
+    grade_distribution: Dict[str, GradeItem]
+
+    pesticide_residue_breakdown: Dict[str, PesticideItem]

@@ -98,9 +98,21 @@ VALID_DISTRICTS = {
     "satkhira": "Satkhira",
     "bhola": "Bhola",
     "patuakhali": "Patuakhali",
-    "barisal": "Barisal"
+    "barisal": "Barisal",
+    "pabna" : "Pabna",
+    "cox's bazar" : "Cox's Bazar"
 } 
 
+
+VALID_PESTICIDE_RESIDUES = {
+    "none": "None",
+    "trace": "Trace",
+    "low": "Low",
+    "high": "High"
+} 
+
+
+VALID_CROP_IDS = [1, 2, 3, 4, 5]
 
 def validate_filter(
     value,

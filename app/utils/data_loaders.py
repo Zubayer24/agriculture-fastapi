@@ -46,3 +46,10 @@ def load_farm_by_id(farm_id: int):
     """
 
     return pd.read_sql(query, engine)
+
+def load_crop_dimension():
+
+    return pd.read_sql(
+        "SELECT * FROM dim_crop",
+        engine
+    )
