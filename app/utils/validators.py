@@ -123,7 +123,7 @@ def validate_filter(
     if value is None:
         return None
 
-    # STRING FILTERS
+
     if isinstance(value, str):
 
         normalized_value = value.strip().lower()
@@ -136,7 +136,7 @@ def validate_filter(
 
         return valid_values[normalized_value]
 
-    # INTEGER FILTERS
+  
     else:
 
         if value not in valid_values:

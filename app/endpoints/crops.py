@@ -1,64 +1,17 @@
-from fastapi import (
-    APIRouter,
-    HTTPException,
-    Query
-)
-
-from app.services.crop_service import (
-    get_yield_efficiency,
-    get_crop_trend,
-    get_quality_breakdown
-)
-
-from app.schemas.crop_schema import (
-    YieldEfficiencyResponse,
-    SeasonalTrendResponse,
-    QualityBreakdownResponse
-) 
-
-from app.utils.validators import (
-    validate_filter,
-    VALID_CROP_CATEGORIES,
-    VALID_REGIONS,
-    VALID_YEARS,
-    VALID_QUARTERS,
-    VALID_MARKET_TYPES,
-    VALID_PESTICIDE_RESIDUES,
-    VALID_CROP_IDS
-)
-
-
-
-
-from app.services.market_service import (
-    get_market_price_comparison
-)
-
-from app.schemas.market_schema import (
-    MarketPriceComparisonResponse
-)
-
-from app.utils.validators import (
-    validate_filter,
-    VALID_MARKET_TYPES,
-    VALID_CROP_CATEGORIES,
-    VALID_YEARS,
-    VALID_SEASONS,
-    VALID_PRICE_TIERS,
-    VALID_DISTRICTS
-)
-
-
+from fastapi import APIRouter, HTTPException,Query
+from app.services.crop_service import get_yield_efficiency, get_crop_trend, get_quality_breakdown
+from app.schemas.crop_schema import YieldEfficiencyResponse, SeasonalTrendResponse, QualityBreakdownResponse
+from app.services.market_service import get_market_price_comparison
+from app.schemas.market_schema import MarketPriceComparisonResponse
+from app.utils.validators import validate_filter, VALID_CROP_CATEGORIES, VALID_REGIONS, VALID_YEARS, VALID_QUARTERS, VALID_MARKET_TYPES, VALID_PESTICIDE_RESIDUES, VALID_CROP_IDS, VALID_SEASONS, VALID_PRICE_TIERS, VALID_DISTRICTS
 from app.database import engine
 import pandas as pd
 
+
+
 router = APIRouter()
 
-@router.get(
-    "/crops/yield-efficiency",
-    response_model=YieldEfficiencyResponse
-) 
-
+@router.get("/crops/yield-efficiency", response_model=YieldEfficiencyResponse) 
 
 
 def yield_efficiency(
@@ -70,14 +23,7 @@ def yield_efficiency(
 
     df = pd.read_sql("SELECT * FROM vw_harvest_full", engine)
 
-    result_df = get_yield_efficiency(
-        df,
-        crop_category,
-        season,
-        year,
-        region,
-        water_requirement
-    )
+    result_df = get_yield_efficiency(df, crop_category, season, year, region, water_requirement)
 
 
     filters_applied = {}
@@ -107,84 +53,41 @@ def yield_efficiency(
         ]].to_dict(orient="records")
     } 
 
-@router.get(
-    "/crops/seasonal-trend",
-    response_model=SeasonalTrendResponse
-)
+
+
+
+@router.get("/crops/seasonal-trend", response_model=SeasonalTrendResponse)
+
+
 def seasonal_trend(
 
-    crop_name: str = Query(
-        None,
-        description="Filter by crop name"
-    ),
+    crop_name: str = Query(None,description="Filter by crop name"),
 
-    crop_category: str = Query(
-        None,
-        description="Filter by crop category"
-    ),
+    crop_category: str = Query(None,description="Filter by crop category"),
 
-    year: int = Query(
-        None,
-        description="Filter by year"
-    ),
+    year: int = Query(None,description="Filter by year"),
 
-    quarter: int = Query(
-        None,
-        description="Filter by quarter"
-    ),
+    quarter: int = Query(None, description="Filter by quarter"),
 
-    market_type: str = Query(
-        None,
-        description="Filter by market type"
-    )
-):
+    market_type: str = Query(None,description="Filter by market type")):
 
     try:
 
-        crop_category = validate_filter(
-            crop_category,
-            VALID_CROP_CATEGORIES,
-            "crop_category"
-        )
+        crop_category = validate_filter(crop_category, VALID_CROP_CATEGORIES, "crop_category")
 
-        year = validate_filter(
-            year,
-            VALID_YEARS,
-            "year"
-        )
+        year = validate_filter(year, VALID_YEARS, "year")
 
-        quarter = validate_filter(
-            quarter,
-            VALID_QUARTERS,
-            "quarter"
-        )
+        quarter = validate_filter(quarter, VALID_QUARTERS ,"quarter")
 
-        market_type = validate_filter(
-            market_type,
-            VALID_MARKET_TYPES,
-            "market_type"
-        )
+        market_type = validate_filter(market_type, VALID_MARKET_TYPES, "market_type")
 
     except ValueError as e:
 
-        raise HTTPException(
-            status_code=422,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=422,detail=str(e))
 
-    df = pd.read_sql(
-        "SELECT * FROM vw_harvest_full",
-        engine
-    )
+    df = pd.read_sql("SELECT * FROM vw_harvest_full",engine)
 
-    result_df = get_crop_trend(
-        df,
-        crop_name,
-        crop_category,
-        year,
-        quarter,
-        market_type
-    )
+    result_df = get_crop_trend(df,crop_name,crop_category, year, quarter,market_type)
 
     filters_applied = {}
 
@@ -203,12 +106,9 @@ def seasonal_trend(
     if market_type is not None:
         filters_applied["market_type"] = market_type
 
-    return {
+    return {"filters_applied": filters_applied,
 
-        "filters_applied": filters_applied,
-
-        "trend": result_df[
-            [
+        "trend": result_df[[
                 "crop_name",
                 "year",
                 "quarter",
@@ -216,95 +116,45 @@ def seasonal_trend(
                 "total_quantity_sold_ton",
                 "total_revenue_bdt",
                 "avg_price_per_ton_bdt",
-                "num_harvests"
-            ]
-        ].to_dict(orient="records")
-    } 
+                "num_harvests"]].to_dict(orient="records")} 
 
 
 
 
-@router.get(
-    "/markets/price-comparison",
-    response_model=MarketPriceComparisonResponse
-)
+@router.get("/markets/price-comparison",response_model=MarketPriceComparisonResponse)
+
+
 def market_price_comparison(
 
-    market_type: str = Query(
-        None,
-        description="Filter by market type"
-    ),
+    market_type: str = Query(None, description="Filter by market type"),
 
-    crop_category: str = Query(
-        None,
-        description="Filter by crop category"
-    ),
+    crop_category: str = Query(None, description="Filter by crop category"),
 
-    year: int = Query(
-        None,
-        description="Filter by year"
-    ),
+    year: int = Query(None, description="Filter by year"),
 
-    season: str = Query(
-        None,
-        description="Filter by season"
-    ),
+    season: str = Query(None,description="Filter by season"),
 
-    price_tier: str = Query(
-        None,
-        description="Filter by price tier"
-    ),
+    price_tier: str = Query(None, description="Filter by price tier"),
 
-    district: str = Query(
-        None,
-        description="Filter by district"
-    )
-):
+    district: str = Query(None, description="Filter by district")):
 
     try:
 
-        market_type = validate_filter(
-            market_type,
-            VALID_MARKET_TYPES,
-            "market_type"
-        )
+        market_type = validate_filter(market_type,VALID_MARKET_TYPES,"market_type")
 
-        crop_category = validate_filter(
-            crop_category,
-            VALID_CROP_CATEGORIES,
-            "crop_category"
-        )
+        crop_category = validate_filter(crop_category, VALID_CROP_CATEGORIES,"crop_category")
 
-        year = validate_filter(
-            year,
-            VALID_YEARS,
-            "year"
-        )
+        year = validate_filter(year,VALID_YEARS,"year")
 
-        season = validate_filter(
-            season,
-            VALID_SEASONS,
-            "season"
-        )
+        season = validate_filter(season,VALID_SEASONS,"season")
 
-        price_tier = validate_filter(
-            price_tier,
-            VALID_PRICE_TIERS,
-            "price_tier"
-        )
+        price_tier = validate_filter(price_tier, VALID_PRICE_TIERS, "price_tier")
 
-        district = validate_filter(
-            district,
-            VALID_DISTRICTS,
-            "district"
-)
+        district = validate_filter(district,VALID_DISTRICTS,"district")
 
     except ValueError as e:
 
-        raise HTTPException(
-            status_code=422,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=422, detail=str(e))
 
     comparison_df = get_market_price_comparison(
         market_type,
@@ -335,12 +185,9 @@ def market_price_comparison(
     if district is not None:
         filters_applied["district"] = district
 
-    return {
+    return { "filters_applied": filters_applied,
 
-        "filters_applied": filters_applied,
-
-        "comparison": comparison_df[
-            [
+        "comparison": comparison_df[[
                 "market_name",
                 "market_type",
                 "price_tier",
@@ -348,101 +195,46 @@ def market_price_comparison(
                 "crop_name",
                 "avg_price_per_ton_bdt",
                 "total_quantity_sold_ton",
-                "total_revenue_bdt"
-            ]
-        ].to_dict(orient="records")
-    }
+                "total_revenue_bdt"]].to_dict(orient="records")}
 
 
-@router.get(
-    "/crops/quality-breakdown",
-    response_model=QualityBreakdownResponse
-)
+
+@router.get("/crops/quality-breakdown",response_model=QualityBreakdownResponse)
+
+
 def quality_breakdown(
 
-    crop_id: int = Query(
-        None,
-        description="Filter by crop id"
-    ),
+    crop_id: int = Query(None,description="Filter by crop id"),
 
-    crop_category: str = Query(
-        None,
-        description="Filter by crop category"
-    ),
+    crop_category: str = Query(None,description="Filter by crop category"),
 
-    year: int = Query(
-        None,
-        description="Filter by year"
-    ),
+    year: int = Query(None, description="Filter by year"),
 
-    region: str = Query(
-        None,
-        description="Filter by region"
-    ),
+    region: str = Query(None, description="Filter by region"),
 
-    market_type: str = Query(
-        None,
-        description="Filter by market type"
-    ),
+    market_type: str = Query(None, description="Filter by market type"),
 
-    pesticide_residue: str = Query(
-        None,
-        description="Filter by pesticide residue"
-    )
-):
+    pesticide_residue: str = Query(None, description="Filter by pesticide residue")):
 
     try:
 
-        crop_category = validate_filter(
-            crop_category,
-            VALID_CROP_CATEGORIES,
-            "crop_category"
-        )
+        crop_category = validate_filter(crop_category, VALID_CROP_CATEGORIES, "crop_category")
 
-        crop_id = validate_filter(
-            crop_id,
-            VALID_CROP_IDS,
-            "crop_id")
+        crop_id = validate_filter(crop_id, VALID_CROP_IDS,"crop_id")
 
-        year = validate_filter(
-            year,
-            VALID_YEARS,
-            "year"
-        )
+        year = validate_filter(year, VALID_YEARS, "year")
 
-        region = validate_filter(
-            region,
-            VALID_REGIONS,
-            "region"
-        )
+        region = validate_filter(region, VALID_REGIONS, "region")
 
-        market_type = validate_filter(
-            market_type,
-            VALID_MARKET_TYPES,
-            "market_type"
-        )
+        market_type = validate_filter(market_type, VALID_MARKET_TYPES,"market_type")
 
-        pesticide_residue = validate_filter(
-            pesticide_residue,
-            VALID_PESTICIDE_RESIDUES,
-            "pesticide_residue"
-        )
+        pesticide_residue = validate_filter(pesticide_residue, VALID_PESTICIDE_RESIDUES, "pesticide_residue")
 
     except ValueError as e:
 
-        raise HTTPException(
-            status_code=422,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=422,detail=str(e))
 
-    result = get_quality_breakdown(
-        crop_id,
-        crop_category,
-        year,
-        region,
-        market_type,
-        pesticide_residue
-    )
+    result = get_quality_breakdown(crop_id, crop_category, year, region, market_type, pesticide_residue)
 
     filters_applied = {}
 

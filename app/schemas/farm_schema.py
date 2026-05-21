@@ -23,10 +23,6 @@ class FarmSummaryResponse(BaseModel):
     data: List[FarmSummaryItem]
 
 
-# ------------------------------------
-
-
-
 
 
 class FarmPerformanceItem(BaseModel):
@@ -51,7 +47,6 @@ class FarmPerformanceResponse(BaseModel):
     performance: List[FarmPerformanceItem]
 
 
-# ------------------------------------
 
 
 class TopFarmItem(BaseModel):
@@ -71,7 +66,6 @@ class TopFarmResponse(BaseModel):
     rankings: List[Dict]
 
 
-# ------------------------------------
 
 
 class LossBreakdownItem(BaseModel):

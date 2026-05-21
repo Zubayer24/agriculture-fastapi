@@ -2,19 +2,18 @@ from pydantic import BaseModel
 from typing import List, Dict
 
 
-from pydantic import BaseModel
-from typing import List, Dict
-
-
 class YieldEfficiencyItem(BaseModel):
 
     crop_name: str
-    crop_category: str
 
+    crop_category: str
+    
     avg_yield_benchmark_ton_per_ha: float
+    
     actual_avg_yield_ton_per_ha: float
 
     efficiency_pct: float
+    
     total_area_planted_ha: float
 
     season: str
@@ -26,7 +25,7 @@ class YieldEfficiencyResponse(BaseModel):
     data: List[YieldEfficiencyItem]
 
 
-# ------------------------------------
+
 
 
 class SeasonalTrendItem(BaseModel):
@@ -49,12 +48,6 @@ class SeasonalTrendResponse(BaseModel):
 
     trend: List[SeasonalTrendItem] 
 
-
-# ------------------------------------
-
-
-from typing import Dict
-from pydantic import BaseModel
 
 
 class GradeItem(BaseModel):
