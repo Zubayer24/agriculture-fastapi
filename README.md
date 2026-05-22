@@ -20,21 +20,39 @@ The project provides analytical endpoints for farm performance, crop efficiency,
 # Project Structure
 
 ```bash
-AGRICULTURE-FASTAPI/
+
+agriculture-fastapi/
 │
 ├── app/
 │   ├── endpoints/
+│   │   ├── farms.py          # Farm-related endpoints (4 endpoints)
+│   │   └── crops.py          # Crop, market endpoints (4 endpoints)
+│   │
 │   ├── services/
+│   │   ├── farm_service.py   # Business logic for farm analytics
+│   │   ├── crop_service.py   # Business logic for crop analytics
+│   │   └── market_service.py # Business logic for market analytics
+│   │
 │   ├── schemas/
+│   │   ├── farm_schema.py    # Pydantic response models for farms
+│   │   ├── crop_schema.py    # Pydantic response models for crops
+│   │   └── market_schema.py  # Pydantic response models for markets
+│   │
 │   ├── utils/
-│   ├── main.py
-│   └── database.py
+│   │   ├── validators.py     # Valid filter sets & validate_filter()
+│   │   ├── filters.py        # apply_filters() utility
+│   │   ├── data_loaders.py   # DB query helpers (load_harvest_data, etc.)
+│   │   └── constants.py      # Shared constants
+│   │
+│   ├── main.py               # App entry point, router registration
+│   ├── database.py           # SQLAlchemy engine setup
+│   └── config.py             # .env loader
 │
 ├── requirements.txt
 ├── Dockerfile
 ├── .dockerignore
-├── README.md
-└── .env
+├── .gitignore
+└── README.md
 ```
 
 ---
