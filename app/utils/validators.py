@@ -130,9 +130,12 @@ def validate_filter(
 
         if normalized_value not in valid_values:
 
+            allowed_values = list(valid_values.values()) 
+
             raise ValueError(
-                f"Invalid {field_name}"
-            )
+                f"Invalid {field_name}. "
+                f"Allowed values: "
+                f"{', '.join(map(str, allowed_values))}")
 
         return valid_values[normalized_value]
 
@@ -142,7 +145,8 @@ def validate_filter(
         if value not in valid_values:
 
             raise ValueError(
-                f"Invalid {field_name}"
-            )
+                f"Invalid {field_name}. "
+                f"Allowed values: "
+                f"{', '.join(map(str, valid_values))}")
 
         return value 
