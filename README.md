@@ -121,7 +121,7 @@ Database credentials are intentionally excluded from GitHub for security reasons
 ## 1. Clone Repository
 
 ```bash
-git clone <your-github-repo-link>
+git clone https://github.com/Zubayer24/agriculture-fastapi.git
 cd AGRICULTURE-FASTAPI
 ```
 
