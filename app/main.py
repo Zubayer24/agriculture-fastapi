@@ -6,6 +6,13 @@ from app.endpoints.crops import router as crops_router
 
 app = FastAPI(title="Agriculture Analytics API")
 
+@app.get("/")
+def home():
+    return {
+        "message": "Agriculture Analytics API is running 🚀",
+        "docs": "/docs",
+        "health": "OK"
+    }
 app.include_router(farms_router)
 
 app.include_router(crops_router)

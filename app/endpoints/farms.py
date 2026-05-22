@@ -68,13 +68,13 @@ def farm_summary(
 
 def farm_performance(
 
-    farm_id: int = Path(..., description="ID of the farm",example=1),
+    farm_id: int = Path(..., description="ID of the farm"),
 
-    year: int = Query(None,description="Filter by year",example=2023),
+    year: int = Query(None,description="Filter by year"),
 
-    crop_category: str = Query(None, description="Filter by crop category", example="Cereal"),
+    crop_category: str = Query(None, description="Filter by crop category"),
 
-    market_type: str = Query(None,description="Filter by market type", example="Wholesale")): 
+    market_type: str = Query(None,description="Filter by market type")): 
 
     try:
 
