@@ -1,8 +1,16 @@
-# Agriculture FastAPI Assessment
+# Agriculture Analytics FastAPI
 
-FastAPI-based Agriculture Analytics API built for the Associate Data Scientist Assessment.
+A FastAPI-powered analytics platform designed to generate actionable insights from agricultural data.
 
-The project provides analytical endpoints for farm performance, crop efficiency, seasonal trends, market comparison, and quality analysis using agricultural datasets.
+Features include:
+
+* Farm performance analysis
+* Crop efficiency evaluation
+* Seasonal trend analysis
+* Market comparison analytics
+* Quality and loss assessment
+
+The API exposes analytical endpoints that support data-driven decision-making in agriculture.
 
 ---
 
